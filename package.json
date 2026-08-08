@@ -1,0 +1,16 @@
+{
+  "name": "elia-site-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared guest-agent tools for Elia sites",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @elia/agent-core && npm run build -w @elia/agent-next",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
