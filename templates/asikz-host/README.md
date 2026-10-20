@@ -58,6 +58,19 @@ export function createAsikzEda() {
 
 Implement `refreshCorpusUrl(eda, url)` in Asikz with your storage and hash table.
 
-## 5. Next step after this package
+## 5. Komitas Data Indexing (KDI)
+
+```json
+"@elia/komitas-data-indexing": "file:./elia-assets/packages/komitas-data-indexing"
+```
+
+- Migrations: `supabase/migrations/0009_kdi_dms_schema.sql`, `0010_kdi_search_and_corpus_bridge.sql`
+- Edge: `int-kdi-ingest`, `int-kdi-process`, `int-kdi-rag-search`
+- Host helpers: `lib/kdi/semantic-search.js`
+- See [ADR 0014](https://github.com/alex-elia/asikz/blob/main/docs/adr/0014-komitas-data-indexing.md) on asikz
+
+Flow: EDA `read` → store in `corpus_documents` → `kdi_create_document` → `int-kdi-ingest` with `process_now: true`.
+
+## 6. Next step after EDA package
 
 Deploy Crawl4AI (and later SearXNG) via **kale-infra** studio-operated manifests, then point `CRAWL4AI_BASE_URL` at the internal service URL.

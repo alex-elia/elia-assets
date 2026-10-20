@@ -26,7 +26,9 @@ const source = await eda.read("https://example.com");
 | `crawl4ai` | `crawl4ai.baseUrl`, optional `apiToken` |
 | `jina` | optional `jina.apiKey` (legacy / smoke) |
 
-Search requires a `search` `SearchProvider` on config (SearXNG adapter planned after infra).
+Search: set `SEARXNG_BASE_URL` and use `createEdaClientFromEnv()` or pass `createSearxngSearchProvider` on config.
+
+Local backends: `kale-infra/Local_Infra_Tools/eda-local` (data on D: via `EDA_DATA_ROOT`). Smoke: `npm run eda:smoke` from elia-assets root.
 
 ## Boundaries
 

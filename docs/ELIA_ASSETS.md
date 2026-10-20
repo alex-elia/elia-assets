@@ -29,6 +29,7 @@ elia-assets/
   packages/agent-core/          @elia/agent-core
   packages/agent-next/          @elia/agent-next
   packages/ermis-data-acquisition/   @elia/ermis-data-acquisition (EDA)
+  packages/komitas-data-indexing/    @elia/komitas-data-indexing (KDI)
   templates/next-host/          Konaki, Onira, generic Next hosts
   templates/asikz-host/       Asikz corpus / MCP integration notes
 ```
@@ -38,7 +39,8 @@ elia-assets/
 | Belongs in **elia-assets** | Belongs in **Nemrut / Asikz** |
 |----------------------------|-------------------------------|
 | Provider adapters (Crawl4AI, Jina, later SearXNG/Tavily) | Corpus schemas, MCP tools, CRM tables |
-| Technical normalization types (`AcquiredSource`, `SearchHit`) | Chunking, embeddings, promotion policies |
+| KDI: chunking, embedding clients, `VectorIndex` pgvector adapter | DMS SQL migrations, Edge deployables, scope/RPC policy |
+| Technical normalization types (`AcquiredSource`, `SearchHit`) | Poem segmentation, corpus promotion, availability filters |
 | URL policy, timeouts, honest failure outcomes | pg-boss jobs, LangGraph research graphs |
 | Contract tests for adapters | AQMS, FinOps, tenant authorization |
 
