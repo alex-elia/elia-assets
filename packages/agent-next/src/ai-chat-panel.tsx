@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Send } from "lucide-react";
-import type { AssistantLabels } from "./types.js";
+import type { AssistantLabels, LeadCaptureConfig } from "./types.js";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -10,6 +10,7 @@ type Props = {
   locale: string;
   labels: AssistantLabels;
   maxTurns: number;
+  leadCapture?: LeadCaptureConfig;
 };
 
 function getSessionId(): string {
@@ -22,7 +23,7 @@ function getSessionId(): string {
   return created;
 }
 
-export function AiChatPanel({ locale, labels, maxTurns }: Props) {
+export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: labels.greeting },
   ]);
@@ -30,10 +31,42 @@ export function AiChatPanel({ locale, labels, maxTurns }: Props) {
   const [loading, setLoading] = useState(false);
   const [offline, setOffline] = useState(false);
   const [blocked, setBlocked] = useState(false);
+  const [leadSending, setLeadSending] = useState(false);
+  const [leadSent, setLeadSent] = useState(false);
+  const [leadError, setLeadError] = useState(false);
 
   const userTurns = messages.filter((message) => message.role === "user").length;
   const turnsRemaining = Math.max(0, maxTurns - userTurns);
   const atLimit = userTurns >= maxTurns || blocked;
+
+  async function sendLeadSummary() {
+    const turns = messages.filter((message) => message.role === "user").length;
+    if (!leadCapture || leadSending || leadSent || turns < leadCapture.minUserTurns) {
+      return;
+    }
+    setLeadSending(true);
+    setLeadError(false);
+    try {
+      const res = await fetch(leadCapture.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          locale,
+          sessionId: getSessionId(),
+          messages: messages.slice(1),
+        }),
+      });
+      if (!res.ok) {
+        setLeadError(true);
+        return;
+      }
+      setLeadSent(true);
+    } catch {
+      setLeadError(true);
+    } finally {
+      setLeadSending(false);
+    }
+  }
 
   async function send() {
     const text = input.trim();
@@ -138,6 +171,30 @@ export function AiChatPanel({ locale, labels, maxTurns }: Props) {
           </p>
         ) : null}
       </div>
+
+      {leadCapture && userTurns >= leadCapture.minUserTurns ? (
+        <div className="mt-2 border-t border-border pt-2">
+          {leadSent ? (
+            <p className="text-center text-xs font-medium text-accent">
+              {leadCapture.labels.success}
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void sendLeadSummary()}
+              disabled={leadSending || loading}
+              className="w-full rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-medium text-primary transition hover:bg-accent/20 disabled:opacity-50"
+            >
+              {leadSending ? leadCapture.labels.sending : leadCapture.labels.button}
+            </button>
+          )}
+          {leadError ? (
+            <p className="mt-1 text-center text-[11px] text-destructive">
+              {leadCapture.labels.error}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {!offline && !atLimit ? (
         <form

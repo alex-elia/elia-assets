@@ -9,7 +9,10 @@ Former repository name: **elia-site-tools** (guest-agent only). The monorepo now
 | Package | Role |
 |---------|------|
 | `@elia/agent-core` | OVH chat, rate limits, Postgres telemetry, weekly reports, Resend mailer |
-| `@elia/agent-next` | Chat API handler factory, guest UI, admin report pages |
+| `@elia/agent-next` | Guest UI only (`GuestAssistant`, `AiChatPanel`, types) |
+| `@elia/agent-next/server` | `createChatHandler` for `/api/chat` routes |
+| `@elia/agent-next/admin` | Admin report pages and route handlers |
+| `@elia/agent-next/client` | Same as main entry (explicit client boundary) |
 | `@elia/ermis-data-acquisition` | **EDA**: bounded web search/read, provider adapters (Crawl4AI, Jina legacy) |
 
 Related ADRs (in Nemrut): [0057 EDA](https://github.com/alex-elia/nemrut/blob/develop/docs/adr/0057-ermis-data-acquisition-shared-capability.md), [0056 web research stack](https://github.com/alex-elia/nemrut/blob/develop/docs/adr/0056-reusable-web-research-and-continuous-knowledge-ingestion.md).

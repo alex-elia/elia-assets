@@ -9,6 +9,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./admin": {
+      "types": "./dist/admin-public.d.ts",
+      "import": "./dist/admin-public.js"
+    },
+    "./server": {
+      "types": "./dist/server-public.d.ts",
+      "import": "./dist/server-public.js"
     }
   },
   "files": [

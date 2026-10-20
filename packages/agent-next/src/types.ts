@@ -12,6 +12,17 @@ export type AssistantLabels = {
   turnLimit: string;
 };
 
+export type LeadCaptureConfig = {
+  endpoint: string;
+  minUserTurns: number;
+  labels: {
+    button: string;
+    sending: string;
+    success: string;
+    error: string;
+  };
+};
+
 export type GuestAssistantProps = {
   locale: string;
   whatsappHref: string;
