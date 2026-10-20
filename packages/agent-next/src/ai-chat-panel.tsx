@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2, Send } from "lucide-react";
-import type { AssistantLabels, LeadCaptureConfig } from "./types.js";
+import type {
+  AssistantLabels,
+  LeadCaptureConfig,
+  SessionNotifyConfig,
+} from "./types.js";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -10,7 +14,10 @@ type Props = {
   locale: string;
   labels: AssistantLabels;
   maxTurns: number;
+  /** When false, hide the per-visit cap notice and counter (limit still enforced). */
+  showUsageLimits?: boolean;
   leadCapture?: LeadCaptureConfig;
+  sessionNotify?: SessionNotifyConfig;
 };
 
 function getSessionId(): string {
@@ -23,10 +30,20 @@ function getSessionId(): string {
   return created;
 }
 
-export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
+export function AiChatPanel({
+  locale,
+  labels,
+  maxTurns,
+  showUsageLimits = true,
+  leadCapture,
+  sessionNotify,
+}: Props) {
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: labels.greeting },
   ]);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [offline, setOffline] = useState(false);
@@ -34,10 +51,72 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
   const [leadSending, setLeadSending] = useState(false);
   const [leadSent, setLeadSent] = useState(false);
   const [leadNotice, setLeadNotice] = useState<string | null>(null);
+  const lastNotifyDigestRef = useRef<string | null>(null);
 
   const userTurns = messages.filter((message) => message.role === "user").length;
   const turnsRemaining = Math.max(0, maxTurns - userTurns);
   const atLimit = userTurns >= maxTurns || blocked;
+
+  function flushSessionNotify() {
+    if (!sessionNotify) return;
+    const transcript = messagesRef.current.slice(1);
+    const turns = transcript.filter((message) => message.role === "user").length;
+    if (turns < sessionNotify.minUserTurns) return;
+
+    const digest = JSON.stringify({ sessionId: getSessionId(), transcript });
+    if (lastNotifyDigestRef.current === digest) return;
+    lastNotifyDigestRef.current = digest;
+
+    const body = JSON.stringify({
+      intent: "session-end",
+      locale,
+      sessionId: getSessionId(),
+      messages: transcript,
+    });
+
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: "application/json" });
+        navigator.sendBeacon(sessionNotify.endpoint, blob);
+        return;
+      }
+    } catch {
+      // fall through to fetch
+    }
+
+    void fetch(sessionNotify.endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+    });
+  }
+
+  useEffect(() => {
+    return () => {
+      flushSessionNotify();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- flush latest transcript on unmount only
+  }, []);
+
+  useEffect(() => {
+    if (!sessionNotify) return;
+    const onHide = () => {
+      if (document.visibilityState === "hidden") {
+        flushSessionNotify();
+      }
+    };
+    document.addEventListener("visibilitychange", onHide);
+    return () => document.removeEventListener("visibilitychange", onHide);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionNotify]);
+
+  useEffect(() => {
+    if (blocked) {
+      flushSessionNotify();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocked]);
 
   async function sendLeadSummary() {
     const turns = messages.filter((message) => message.role === "user").length;
@@ -51,6 +130,7 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          intent: "send-summary",
           locale,
           sessionId: getSessionId(),
           messages: messages.slice(1),
@@ -149,14 +229,16 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
 
   return (
     <div className="flex h-[min(60vh,22rem)] flex-col">
-      <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-        {labels.limitsNotice}
-        {!offline && !atLimit ? (
-          <span className="mt-1 block text-[11px] text-muted-foreground/80">
-            {turnsRemaining} / {maxTurns}
-          </span>
-        ) : null}
-      </p>
+      {showUsageLimits ? (
+        <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+          {labels.limitsNotice}
+          {!offline && !atLimit ? (
+            <span className="mt-1 block text-[11px] text-muted-foreground/80">
+              {turnsRemaining} / {maxTurns}
+            </span>
+          ) : null}
+        </p>
+      ) : null}
 
       <div className="flex-1 space-y-3 overflow-y-auto pr-1 text-sm">
         {messages.map((message, index) => (

@@ -26,6 +26,12 @@ export type LeadCaptureConfig = {
   };
 };
 
+/** Silent transcript delivery when the visitor closes the panel or leaves the page. */
+export type SessionNotifyConfig = {
+  endpoint: string;
+  minUserTurns: number;
+};
+
 export type GuestAssistantProps = {
   locale: string;
   whatsappHref: string;
