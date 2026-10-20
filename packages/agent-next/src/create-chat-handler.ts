@@ -172,6 +172,20 @@ export function createChatHandler(options: CreateChatHandlerOptions) {
         turnCount: userTurns,
       });
 
+      if (options.onSuccess) {
+        void Promise.resolve(
+          options.onSuccess({
+            locale,
+            sessionId,
+            userTurns,
+            messages,
+            reply,
+          }),
+        ).catch((error: unknown) => {
+          console.error("[agent-chat:onSuccess]", error);
+        });
+      }
+
       return Response.json({
         reply,
         limits: {

@@ -52,10 +52,19 @@ export type GuestAssistantProps = {
   bookIcon?: "mail" | "calendar";
 };
 
+export type ChatSuccessContext = {
+  locale: string;
+  sessionId: string;
+  userTurns: number;
+  messages: ChatMessage[];
+  reply: string;
+};
+
 export type CreateChatHandlerOptions = {
   siteId: string;
   buildSystemPrompt: (locale: string) => Promise<string>;
   rateLimitedMessage: string;
+  onSuccess?: (context: ChatSuccessContext) => void | Promise<void>;
 };
 
 export type AdminOptions = {

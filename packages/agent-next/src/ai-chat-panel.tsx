@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Send } from "lucide-react";
+import { AssistantMessageBody } from "./assistant-message-body.js";
 import type {
   AssistantLabels,
   LeadCaptureConfig,
@@ -16,6 +17,7 @@ type Props = {
   maxTurns: number;
   /** When false, hide the per-visit cap notice and counter (limit still enforced). */
   showUsageLimits?: boolean;
+  renderRichAssistantText?: boolean;
   leadCapture?: LeadCaptureConfig;
   sessionNotify?: SessionNotifyConfig;
 };
@@ -35,6 +37,7 @@ export function AiChatPanel({
   labels,
   maxTurns,
   showUsageLimits = true,
+  renderRichAssistantText = false,
   leadCapture,
   sessionNotify,
 }: Props) {
@@ -250,9 +253,13 @@ export function AiChatPanel({
                 : "mr-4 rounded-lg bg-secondary px-3 py-2 text-primary"
             }
           >
-            <p className="whitespace-pre-wrap leading-relaxed">
-              {message.content}
-            </p>
+            {message.role === "assistant" && renderRichAssistantText ? (
+              <AssistantMessageBody content={message.content} />
+            ) : (
+              <p className="whitespace-pre-wrap leading-relaxed">
+                {message.content}
+              </p>
+            )}
           </div>
         ))}
 
