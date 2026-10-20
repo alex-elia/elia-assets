@@ -5,6 +5,8 @@ export type AssistantLabels = {
   send: string;
   thinking: string;
   error: string;
+  /** Soft reply when chat API fails (no technical wording). */
+  fallback?: string;
   offline: string;
   greeting: string;
   limitsNotice: string;
@@ -19,7 +21,8 @@ export type LeadCaptureConfig = {
     button: string;
     sending: string;
     success: string;
-    error: string;
+    /** Shown when the server could not email (no red error state). */
+    fallback?: string;
   };
 };
 

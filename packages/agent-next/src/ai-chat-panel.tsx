@@ -33,7 +33,7 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
   const [blocked, setBlocked] = useState(false);
   const [leadSending, setLeadSending] = useState(false);
   const [leadSent, setLeadSent] = useState(false);
-  const [leadError, setLeadError] = useState(false);
+  const [leadNotice, setLeadNotice] = useState<string | null>(null);
 
   const userTurns = messages.filter((message) => message.role === "user").length;
   const turnsRemaining = Math.max(0, maxTurns - userTurns);
@@ -45,7 +45,7 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
       return;
     }
     setLeadSending(true);
-    setLeadError(false);
+    setLeadNotice(null);
     try {
       const res = await fetch(leadCapture.endpoint, {
         method: "POST",
@@ -56,13 +56,20 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
           messages: messages.slice(1),
         }),
       });
-      if (!res.ok) {
-        setLeadError(true);
-        return;
+      let delivered = false;
+      try {
+        const data = (await res.json()) as { delivered?: boolean; ok?: boolean };
+        delivered = Boolean(data.delivered);
+      } catch {
+        delivered = false;
       }
       setLeadSent(true);
+      const softLead =
+        leadCapture.labels.fallback ?? leadCapture.labels.success;
+      setLeadNotice(delivered ? leadCapture.labels.success : softLead);
     } catch {
-      setLeadError(true);
+      setLeadSent(true);
+      setLeadNotice(leadCapture.labels.fallback ?? leadCapture.labels.success);
     } finally {
       setLeadSending(false);
     }
@@ -118,7 +125,10 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
       if (!res.ok || !data.reply) {
         setMessages((current) => [
           ...current,
-          { role: "assistant", content: labels.error },
+          {
+            role: "assistant",
+            content: labels.fallback ?? labels.offline,
+          },
         ]);
         return;
       }
@@ -130,7 +140,7 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
     } catch {
       setMessages((current) => [
         ...current,
-        { role: "assistant", content: labels.error },
+        { role: "assistant", content: labels.fallback ?? labels.offline },
       ]);
     } finally {
       setLoading(false);
@@ -175,8 +185,8 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
       {leadCapture && userTurns >= leadCapture.minUserTurns ? (
         <div className="mt-2 border-t border-border pt-2">
           {leadSent ? (
-            <p className="text-center text-xs font-medium text-accent">
-              {leadCapture.labels.success}
+            <p className="text-center text-xs leading-snug text-muted-foreground">
+              {leadNotice ?? leadCapture.labels.success}
             </p>
           ) : (
             <button
@@ -188,11 +198,6 @@ export function AiChatPanel({ locale, labels, maxTurns, leadCapture }: Props) {
               {leadSending ? leadCapture.labels.sending : leadCapture.labels.button}
             </button>
           )}
-          {leadError ? (
-            <p className="mt-1 text-center text-[11px] text-destructive">
-              {leadCapture.labels.error}
-            </p>
-          ) : null}
         </div>
       ) : null}
 
