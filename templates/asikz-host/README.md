@@ -56,7 +56,7 @@ export function createAsikzEda() {
 }
 ```
 
-Implement `refreshCorpusUrl(eda, url)` in Asikz with your storage and hash table.
+Implemented in asikz: `lib/eda/create-asikz-eda.js`, `lib/kdi/register-acquired.js`, `npm run acquire:to-kdi -- <url>`.
 
 ## 5. Komitas Data Indexing (KDI)
 
