@@ -30,6 +30,7 @@ elia-assets/
   packages/agent-next/          @elia/agent-next
   packages/ermis-data-acquisition/   @elia/ermis-data-acquisition (EDA)
   packages/komitas-data-indexing/    @elia/komitas-data-indexing (KDI)
+  packages/amira-retrieval/          @elia/amira-retrieval (ARO: hybrid retrieval orchestration)
   templates/next-host/          Konaki, Onira, generic Next hosts
   templates/asikz-host/       Asikz corpus / MCP integration notes
 ```
