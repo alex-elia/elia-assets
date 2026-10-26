@@ -1,0 +1,46 @@
+{
+  "name": "@elia/janissary-auth",
+  "version": "0.1.0",
+  "description": "Janissary: shared Next.js identity facade (ports + Supabase adapter)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./supabase": {
+      "types": "./dist/supabase/index.d.ts",
+      "import": "./dist/supabase/index.js"
+    },
+    "./supabase/server": {
+      "types": "./dist/supabase/server-entry.d.ts",
+      "import": "./dist/supabase/server-entry.js"
+    },
+    "./supabase/middleware": {
+      "types": "./dist/supabase/middleware.d.ts",
+      "import": "./dist/supabase/middleware.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.test.js"
+  },
+  "peerDependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "next": "^15.0.0 || ^16.0.0"
+  },
+  "devDependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.49.8",
+    "@types/node": "^24.3.0",
+    "next": "^15.3.8",
+    "typescript": "^5.9.2"
+  }
+}

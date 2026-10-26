@@ -31,6 +31,7 @@ elia-assets/
   packages/ermis-data-acquisition/   @elia/ermis-data-acquisition (EDA)
   packages/komitas-data-indexing/    @elia/komitas-data-indexing (KDI)
   packages/amira-retrieval/          @elia/amira-retrieval (ARO: hybrid retrieval orchestration)
+  packages/janissary-auth/           @elia/janissary-auth (Janissary: Next.js identity facade, Supabase adapter v1)
   templates/next-host/          Konaki, Onira, generic Next hosts
   templates/asikz-host/       Asikz corpus / MCP integration notes
 ```
