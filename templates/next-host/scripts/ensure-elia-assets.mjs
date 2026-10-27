@@ -45,7 +45,8 @@ function hasBuiltPackages(dir) {
     fs.existsSync(path.join(dir, "packages", "agent-next", "dist", "index.js")) &&
     fs.existsSync(
       path.join(dir, "packages", "ermis-data-acquisition", "dist", "index.js"),
-    )
+    ) &&
+    fs.existsSync(path.join(dir, "packages", "aqms-core", "dist", "index.js"))
   );
 }
 

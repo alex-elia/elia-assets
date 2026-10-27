@@ -7,9 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @elia/agent-core && npm run build -w @elia/agent-next && npm run build -w @elia/janissary-auth && npm run build -w @elia/ermis-data-acquisition && npm run build -w @elia/komitas-data-indexing && npm run build -w @elia/amira-retrieval",
+    "build": "npm run build -w @elia/agent-core && npm run build -w @elia/agent-next && npm run build -w @elia/janissary-auth && npm run build -w @elia/ermis-data-acquisition && npm run build -w @elia/komitas-data-indexing && npm run build -w @elia/amira-retrieval && npm run build -w @elia/aqms-core",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test -w @elia/ermis-data-acquisition && npm run test -w @elia/komitas-data-indexing && npm run test -w @elia/amira-retrieval",
+    "test": "npm run test -w @elia/ermis-data-acquisition && npm run test -w @elia/komitas-data-indexing && npm run test -w @elia/amira-retrieval && npm run test -w @elia/aqms-core",
     "eda:smoke": "npm run build -w @elia/ermis-data-acquisition && node packages/ermis-data-acquisition/scripts/smoke-eda.mjs"
   },
   "engines": {
