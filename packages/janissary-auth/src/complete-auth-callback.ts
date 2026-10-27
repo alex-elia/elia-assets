@@ -42,22 +42,37 @@ export async function completeAuthCallback(
 ): Promise<NextResponse> {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const tokenHash = requestUrl.searchParams.get("token_hash");
+  const tokenHash =
+    requestUrl.searchParams.get("token_hash") ??
+    requestUrl.searchParams.get("token");
   const type = requestUrl.searchParams.get("type");
   const next = safeNextPath(requestUrl.searchParams.get("next"), options.defaultNext);
 
-  let errorMessage: string | null = null;
+  const authError =
+    requestUrl.searchParams.get("error_description") ??
+    requestUrl.searchParams.get("error");
 
-  if (code) {
+  let errorMessage: string | null = authError;
+
+  if (!errorMessage && code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) errorMessage = error.message;
-  } else if (tokenHash && isEmailOtpType(type)) {
+    if (error) {
+      errorMessage = error.message;
+      if (tokenHash && isEmailOtpType(type)) {
+        const fallback = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type,
+        });
+        if (!fallback.error) errorMessage = null;
+      }
+    }
+  } else if (!errorMessage && tokenHash && isEmailOtpType(type)) {
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
       type,
     });
     if (error) errorMessage = error.message;
-  } else {
+  } else if (!errorMessage && !code) {
     errorMessage = "Missing auth code";
   }
 
