@@ -1,0 +1,17 @@
+{
+  "name": "@elia/sinan-ingestion-quality",
+  "version": "0.1.0",
+  "description": "Sinan: deterministic assess, AI redressement, scoring and publish decisions for corpus ingestion",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "profiles"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

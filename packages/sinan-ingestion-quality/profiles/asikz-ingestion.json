@@ -1,0 +1,13 @@
+{
+  "profile_id": "asikz-ingestion",
+  "profile_version": "1.0.0",
+  "publish_threshold": 85,
+  "review_threshold": 70,
+  "weights": {
+    "deterministic": 0.75,
+    "redresse": 0.15,
+    "schema": 0.1
+  },
+  "allowed_redresse_fields": ["text_body", "titles", "contributors", "bio_summary"],
+  "deny_auto_publish_rights": ["restricted"]
+}
